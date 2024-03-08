@@ -45,13 +45,16 @@ struct ParentData {
 
 fn main() {
     let socket_path = "/var/run/tetragon/tetragon.sock";
-    let socket = open_tetra_socket(socket_path).unwrap();
-    let mut mutable_socket = socket.try_clone().unwrap();
+    if let Ok(socket) = open_tetra_socket(socket_path) {
+        let mut mutable_socket = socket.try_clone().unwrap();
 
-    println!("Socket connection established");
+        println!("Socket connection established");
 
-    while let Some(event) = grpc_read_tetra_event(&mut mutable_socket) {
-        println!("Received event: {:?}", event);
+        while let Some(event) = grpc_read_tetra_event(&mut mutable_socket) {
+            println!("Received event: {:?}", event);
+        }
+    } else {
+        println!("Failed to establish socket connection");
     }
 }
 
